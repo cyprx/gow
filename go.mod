@@ -1,3 +1,3 @@
-module github.com/cyprx/goWorker
+module github.com/cyprx/gow
 
 go 1.12

@@ -1,3 +1,3 @@
-package pool
+package gow
 
 type Result interface{}

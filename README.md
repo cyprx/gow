@@ -1,1 +1,1 @@
-# Worker pool implements in Go
+# Worker pool implemented in Go

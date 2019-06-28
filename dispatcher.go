@@ -2,7 +2,7 @@ package gow
 
 import (
 	"log"
-	"sync"
+	"time"
 )
 
 type Dispatcher struct {
@@ -11,18 +11,15 @@ type Dispatcher struct {
 	Input     chan Work
 	Output    chan Result
 	Quit      chan bool
-
-	wg *sync.WaitGroup
 }
 
-func NewDispatcher(workerNum int, input chan Work, output chan Result, wg *sync.WaitGroup) *Dispatcher {
+func NewDispatcher(workerNum int, input chan Work, output chan Result) *Dispatcher {
 	return &Dispatcher{
 		WorkerNum: workerNum,
 		PoolChan:  make(chan chan Work),
 		Input:     input,
 		Output:    output,
 		Quit:      make(chan bool),
-		wg:        wg,
 	}
 }
 
@@ -32,7 +29,7 @@ func (d *Dispatcher) Dispatch() {
 	for i := 0; i < d.WorkerNum; i++ {
 		worker := NewWorker(i, d.PoolChan, d.Output)
 		workers = append(workers, worker)
-		worker.Start(d.wg)
+		worker.Start()
 	}
 
 	go func() {
@@ -41,12 +38,15 @@ func (d *Dispatcher) Dispatch() {
 			case work := <-d.Input:
 				worker := <-d.PoolChan
 				worker <- work
-				d.wg.Add(1)
 			case <-d.Quit:
 				for _, worker := range workers {
 					worker.Stop()
 				}
+			default:
+				log.Println("Waiting for job assigned")
+				time.Sleep(2 * time.Second)
 			}
+
 		}
 	}()
 	log.Println("dispatcher goroutine stops")

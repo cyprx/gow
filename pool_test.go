@@ -2,7 +2,6 @@ package gow
 
 import (
 	"log"
-	"sync"
 	"testing"
 	"time"
 )
@@ -21,29 +20,24 @@ func (w *sleepJob) Execute() interface{} {
 }
 
 func TestPool(T *testing.T) {
-	var wg sync.WaitGroup
-	input := make(chan Work, 10)
-	output := make(chan Result, 10)
-	pool := NewPool(5, input, output)
+	pool := NewPool(&PoolConfig{Size: 2})
 
-	pool.Start()
-
-	for i := 0; i < 10; i++ {
-		work := NewWork(i)
-		input <- work
-		wg.Add(1)
-	}
+	go func() {
+		for i := 0; i < 10; i++ {
+			work := NewWork(i)
+			pool.Input() <- work
+		}
+	}()
 
 	go func() {
 		for {
 			select {
-			case res := <-output:
+			case res := <-pool.Output():
 				log.Printf("output: %v", res)
-				wg.Done()
 			}
 		}
 	}()
-	wg.Wait()
+	pool.Start()
 
 	log.Print("Job finished")
 }

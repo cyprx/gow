@@ -2,7 +2,6 @@ package gow
 
 import (
 	"log"
-	"sync"
 )
 
 type Worker struct {
@@ -23,7 +22,7 @@ func NewWorker(id int, poolChan chan chan Work, resultChan chan Result) Worker {
 	}
 }
 
-func (w *Worker) Start(wg *sync.WaitGroup) {
+func (w *Worker) Start() {
 	go func() {
 		for {
 			w.PoolChan <- w.WorkChan
@@ -32,7 +31,6 @@ func (w *Worker) Start(wg *sync.WaitGroup) {
 				log.Printf("Worker %d is running", w.ID)
 				result := work.Execute()
 				w.ResultChan <- result
-				wg.Done()
 			case <-w.Quit:
 				close(w.WorkChan)
 				return

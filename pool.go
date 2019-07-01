@@ -1,24 +1,22 @@
 package gow
 
-import ()
-
 type Pool struct {
 	Size        int
 	InputQueue  chan Work
 	OutputQueue chan Result
-	Quit        chan bool
+	QuitChan    chan bool
 }
 
 type PoolConfig struct {
-	Size           int
-	InputQueueSize int
-	OuputQueueSize int
+	Size            int
+	InputQueueSize  int
+	OutputQueueSize int
 }
 
 func NewPool(config *PoolConfig) *Pool {
 	size := config.Size
 	inputSize := config.InputQueueSize
-	outputSize := config.OuputQueueSize
+	outputSize := config.OutputQueueSize
 	if config.Size == 0 {
 		size = 10
 	}
@@ -32,13 +30,14 @@ func NewPool(config *PoolConfig) *Pool {
 		Size:        size,
 		InputQueue:  make(chan Work, inputSize),
 		OutputQueue: make(chan Result, outputSize),
+		QuitChan:    make(chan bool),
 	}
 }
 
 func (p *Pool) Start() {
 	dispatcher := NewDispatcher(p.Size, p.InputQueue, p.OutputQueue)
 	dispatcher.Dispatch()
-	<-p.Quit
+	<-p.QuitChan
 }
 
 func (p *Pool) Input() chan Work {
@@ -47,4 +46,8 @@ func (p *Pool) Input() chan Work {
 
 func (p *Pool) Output() chan Result {
 	return p.OutputQueue
+}
+
+func (p *Pool) Quit() chan bool {
+	return p.QuitChan
 }

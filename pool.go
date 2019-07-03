@@ -42,6 +42,7 @@ func (p *Pool) Start() {
 	dispatcher := NewDispatcher(p.Size, p.InputQueue, p.OutputQueue)
 	dispatcher.Dispatch()
 	<-p.QuitChan
+	dispatcher.Close()
 	log.Println("Pool closed")
 
 }

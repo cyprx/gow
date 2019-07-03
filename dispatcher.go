@@ -52,3 +52,7 @@ func (d *Dispatcher) Dispatch() {
 	}()
 	log.Println("dispatcher goroutine stops")
 }
+
+func (d *Dispatcher) Close() {
+	d.Quit <- true
+}

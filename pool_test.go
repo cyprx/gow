@@ -37,6 +37,11 @@ func TestPool(T *testing.T) {
 			}
 		}
 	}()
+
+	go func() {
+		time.Sleep(10 * time.Second)
+		pool.Close()
+	}()
 	pool.Start()
 
 	log.Print("Job finished")

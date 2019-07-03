@@ -40,7 +40,8 @@ func NewPool(config *PoolConfig) *Pool {
 
 func (p *Pool) Start() {
 	dispatcher := NewDispatcher(p.Size, p.InputQueue, p.OutputQueue)
-	go dispatcher.Dispatch()
+	dispatcher.Dispatch()
+	log.Println("Waiting for quit command")
 	<-p.QuitChan
 	dispatcher.Close()
 	log.Println("Pool closed")
@@ -55,6 +56,6 @@ func (p *Pool) Output() chan Result {
 	return p.OutputQueue
 }
 
-func (p *Pool) Quit() chan bool {
-	return p.QuitChan
+func (p *Pool) Close() {
+	p.QuitChan <- true
 }

@@ -42,6 +42,7 @@ func (d *Dispatcher) Dispatch() {
 				for _, worker := range workers {
 					worker.Stop()
 				}
+				return
 			default:
 				log.Println("Waiting for job assigned")
 				time.Sleep(2 * time.Second)

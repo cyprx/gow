@@ -1,5 +1,9 @@
 package gow
 
+import (
+	"log"
+)
+
 type Pool struct {
 	Size        int
 	InputQueue  chan Work
@@ -38,6 +42,8 @@ func (p *Pool) Start() {
 	dispatcher := NewDispatcher(p.Size, p.InputQueue, p.OutputQueue)
 	dispatcher.Dispatch()
 	<-p.QuitChan
+	log.Println("Pool closed")
+
 }
 
 func (p *Pool) Input() chan Work {

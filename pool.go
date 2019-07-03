@@ -40,7 +40,7 @@ func NewPool(config *PoolConfig) *Pool {
 
 func (p *Pool) Start() {
 	dispatcher := NewDispatcher(p.Size, p.InputQueue, p.OutputQueue)
-	dispatcher.Dispatch()
+	go dispatcher.Dispatch()
 	<-p.QuitChan
 	dispatcher.Close()
 	log.Println("Pool closed")

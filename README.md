@@ -2,5 +2,9 @@
 
 
 ## Todos
-- More logs
+- Callback
+- Timeout
+- Stop running task
 - Interface for Result could accept void
+- Queue cached
+- More logs

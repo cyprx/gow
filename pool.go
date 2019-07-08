@@ -50,6 +50,7 @@ func NewPool(config *PoolConfig) *Pool {
 
 func (p *Pool) Start() {
 	log.Printf("Pool %s is starting", p.Name)
+
 	dispatcher := NewDispatcher(p.Size, p.InputQueue, p.OutputQueue)
 	dispatcher.Dispatch()
 	<-p.QuitChan

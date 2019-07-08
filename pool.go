@@ -2,9 +2,12 @@ package gow
 
 import (
 	"log"
+
+	"github.com/google/uuid"
 )
 
 type Pool struct {
+	Name        string
 	Size        int
 	InputQueue  chan Work
 	OutputQueue chan Result
@@ -12,16 +15,22 @@ type Pool struct {
 }
 
 type PoolConfig struct {
+	Name            string
 	Size            int
 	InputQueueSize  int
 	OutputQueueSize int
 }
 
 func NewPool(config *PoolConfig) *Pool {
+	name := config.Name
 	size := config.Size
 	inputSize := config.InputQueueSize
 	outputSize := config.OutputQueueSize
-	if config.Size == 0 {
+	if name == "" {
+		id := uuid.New()
+		name = id.String()
+	}
+	if size == 0 {
 		size = 10
 	}
 	if inputSize == 0 {
@@ -31,6 +40,7 @@ func NewPool(config *PoolConfig) *Pool {
 		outputSize = 10
 	}
 	return &Pool{
+		Name:        name,
 		Size:        size,
 		InputQueue:  make(chan Work, inputSize),
 		OutputQueue: make(chan Result, outputSize),
@@ -39,9 +49,9 @@ func NewPool(config *PoolConfig) *Pool {
 }
 
 func (p *Pool) Start() {
+	log.Printf("Pool %s is starting", p.Name)
 	dispatcher := NewDispatcher(p.Size, p.InputQueue, p.OutputQueue)
 	dispatcher.Dispatch()
-	log.Println("Waiting for quit command")
 	<-p.QuitChan
 	dispatcher.Close()
 	log.Println("Pool closed")

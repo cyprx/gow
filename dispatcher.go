@@ -2,7 +2,6 @@ package gow
 
 import (
 	"log"
-	"time"
 )
 
 type Dispatcher struct {
@@ -43,9 +42,6 @@ func (d *Dispatcher) Dispatch() {
 					worker.Stop()
 				}
 				return
-			default:
-				log.Println("Waiting for job assigned")
-				time.Sleep(2 * time.Second)
 			}
 
 		}
